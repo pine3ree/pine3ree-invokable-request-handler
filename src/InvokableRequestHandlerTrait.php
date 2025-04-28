@@ -69,7 +69,7 @@ trait InvokableRequestHandlerTrait
         }
 
         throw new RuntimeException(sprintf(
-            'The method `%s::__invoke(...)` is not implemented for this handler!',
+            'The invokable-handler method `%s::__invoke(...)` is not implemented!',
             static::class
         ));
     }
