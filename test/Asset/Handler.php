@@ -23,16 +23,19 @@ class Handler extends InvokableRequestHandler implements RequestHandlerInterface
     private ?ServerRequestInterface $currentRequest = null;
     private ?Foo $currentFoo = null;
     private ?Bar $currentBar = null;
+    private ?int $currentExtra = null;
 
     public function __invoke(
         ServerRequestInterface $request,
-        Foo $foo,
-        Bar $bar
+        Foo $foo = null,
+        Bar $bar = null,
+        ?int $extra = null
     ): ResponseInterface {
         // Set current values for testing
         $this->currentRequest = $request;
         $this->currentFoo = $foo;
         $this->currentBar = $bar;
+        $this->currentExtra = $extra;
 
         return new HtmlResponse('');
     }
@@ -55,5 +58,10 @@ class Handler extends InvokableRequestHandler implements RequestHandlerInterface
     public function getCurrentBar(): ?Bar
     {
         return $this->currentBar;
+    }
+
+    public function getCurrentExtra(): ?int
+    {
+        return $this->currentExtra;
     }
 }
