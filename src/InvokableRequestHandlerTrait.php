@@ -68,7 +68,6 @@ trait InvokableRequestHandlerTrait
                 $args = $this->paramsResolver->resolve($this, $resolvedParams);
                 return empty($args) ? $this() : $this(...$args);
             } catch (Throwable $ex) {
-                var_dump($ex->getMessage());
                 throw new RuntimeException($ex->getMessage());
             }
         }
