@@ -11,12 +11,14 @@ namespace pine3ree\test\Http\Server;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use ReflectionProperty;
+use RuntimeException;
 use SplObjectStorage;
 use pine3ree\Container\ParamsResolver;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandler;
 use pine3ree\Http\Server\InvokableRequestHandlerFactory;
 use pine3ree\test\Http\Server\Asset\Handler;
+use pine3ree\test\Http\Server\Asset\ComplexHandler;
 
 class InvokableRequestHandlerFactoryTest extends TestCase
 {
@@ -49,7 +51,6 @@ class InvokableRequestHandlerFactoryTest extends TestCase
     public function testThatFactoryUsesCreatesNewParamsResolverIfNotFoundInContainer()
     {
         $container = $this->createMock(ContainerInterface::class);
-
         $container->method('has')->with(ParamsResolverInterface::class)->willReturn(false);
 
         $factory = new InvokableRequestHandlerFactory();
@@ -65,7 +66,6 @@ class InvokableRequestHandlerFactoryTest extends TestCase
     public function testThatFactoryUsesCachesParamsResolverForSameContainer()
     {
         $container = $this->createMock(ContainerInterface::class);
-
         $container->method('has')->with(ParamsResolverInterface::class)->willReturn(false);
 
         $factory = new InvokableRequestHandlerFactory();
@@ -88,5 +88,16 @@ class InvokableRequestHandlerFactoryTest extends TestCase
         self::assertInstanceOf(ParamsResolverInterface::class, $paramsResolver1);
 
         self::assertSame($paramsResolver1, $paramsResolver2);
+    }
+
+    public function testThatHandlerClassesWithComplexConstructorsRaiseException()
+    {
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('has')->with(ParamsResolverInterface::class)->willReturn(false);
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $this->expectException(RuntimeException::class);
+        $complexHandler = $factory($container, ComplexHandler::class);
     }
 }
