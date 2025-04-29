@@ -10,6 +10,7 @@ namespace pine3ree\Http\Server;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
+use Throwable;
 use pine3ree\Container\ParamsResolverInterface;
 
 use function is_callable;
@@ -65,7 +66,11 @@ trait InvokableRequestHandlerTrait
             // Resolve the arguments for the __invoke() method
             $args = $this->paramsResolver->resolve($this, $resolvedParams);
 
-            return empty($args) ? $this() : $this(...$args);
+            try {
+                return empty($args) ? $this() : $this(...$args);
+            } catch (Throwable $ex) {
+                throw new RuntimeException($ex->getMessage());
+            }
         }
 
         throw new RuntimeException(sprintf(
