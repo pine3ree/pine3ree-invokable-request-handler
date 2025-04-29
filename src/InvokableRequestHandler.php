@@ -11,7 +11,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandlerTrait;
 
-
 /**
  * InvokableRequestHandler represents a request-handler whose `__invoke` method is automatically
  * called via by `handle` method. The `__invoke` method can be implemented using
