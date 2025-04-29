@@ -17,7 +17,7 @@ use pine3ree\Http\Server\InvokableRequestHandler;
  * dependencies using reflection
  *
  * The invokable-handler class constructor must only accept a single argument of
- * type ContainerInterface
+ * type ParamsResolverInterface
  */
 class InvokableRequestHandlerFactory
 {
