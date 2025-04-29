@@ -20,6 +20,7 @@ use pine3ree\Http\Server\InvokableRequestHandlerFactory;
 use pine3ree\test\Http\Server\Asset\Bar;
 use pine3ree\test\Http\Server\Asset\Foo;
 use pine3ree\test\Http\Server\Asset\Handler;
+use pine3ree\test\Http\Server\Asset\InvalidHandler;
 
 use function array_merge;
 
@@ -129,6 +130,20 @@ class InvokableRequestHandlerTest extends TestCase
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
         self::assertSame($request->getAttribute('extra'), $handler->getCurrentExtra());
+    }
+
+    public function testThatInvalidInvokeReturnValueRaisesException()
+    {
+        $container = $this->getContainerMock();
+
+        $request = $this->getServerRequestMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $handler = $factory($container, InvalidHandler::class);
+
+        $this->expectException(RuntimeException::class);
+        $handler->handle($request);
     }
 
     private function getContainerMock(array $getMap = [], ?array $hasMap = null): ContainerInterface
