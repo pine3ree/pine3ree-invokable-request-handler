@@ -30,9 +30,11 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "pine3ree/pine3ree-params-resolver": "^0.8",
-        "psr/container": "^1.1.2 || ^2.0"
+        "psr/container": "^1.1.2 || ^2.0",
+        "psr/http-server-handler": "^1.0 || ^2.0"
     },
     "require-dev": {
+        "laminas/laminas-diactoros": "^2.17",
         "phpspec/prophecy-phpunit": "^1.1 || ^2.0",
         "phpstan/phpstan": "^1.10 || ^2.0",
         "phpstan/phpstan-strict-rules": "^1.5",
