@@ -20,6 +20,7 @@ use pine3ree\Http\Server\InvokableRequestHandlerFactory;
 use pine3ree\test\Http\Server\Asset\Bar;
 use pine3ree\test\Http\Server\Asset\Foo;
 use pine3ree\test\Http\Server\Asset\Handler;
+use pine3ree\test\Http\Server\Asset\IncompleteHandler;
 use pine3ree\test\Http\Server\Asset\InvalidHandler;
 
 use function array_merge;
@@ -145,6 +146,21 @@ class InvokableRequestHandlerTest extends TestCase
         $this->expectException(RuntimeException::class);
         $handler->handle($request);
     }
+
+    public function testThatMissingInvokeDefinitionRaisesException()
+    {
+        $container = $this->getContainerMock();
+
+        $request = $this->getServerRequestMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $handler = $factory($container, IncompleteHandler::class);
+
+        $this->expectException(RuntimeException::class);
+        $handler->handle($request);
+    }
+
 
     private function getContainerMock(array $getMap = [], ?array $hasMap = null): ContainerInterface
     {
