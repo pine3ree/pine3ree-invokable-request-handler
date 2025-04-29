@@ -10,7 +10,7 @@ namespace pine3ree\Http\Server;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
-use pine3ree\Container\ParamsResolver;
+use pine3ree\Container\ParamsResolverInterface;
 
 use function is_callable;
 use function sprintf;
@@ -24,7 +24,7 @@ use function sprintf;
  */
 trait InvokableRequestHandlerTrait
 {
-    protected ParamsResolver $paramsResolver;
+    protected ParamsResolverInterface $paramsResolver;
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
