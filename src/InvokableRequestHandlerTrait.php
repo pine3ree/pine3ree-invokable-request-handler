@@ -59,7 +59,7 @@ trait InvokableRequestHandlerTrait
         if (is_callable($this)) {
             // Build params to be injected as resolved arguments
             $resolvedParams = [
-                ServerRequestInterface::class => $request,
+                ServerRequestInterface::class => $request, // Inject the request object
             ] + $request->getAttributes();
 
             // Resolve the arguments for the __invoke() method
