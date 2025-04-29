@@ -84,4 +84,48 @@ class InvokableRequestHandlerTest extends TestCase
         self::assertSame($container->get(Foo::class), $handler->getCurrentFoo());
         self::assertSame($container->get(Bar::class), $handler->getCurrentBar());
     }
+
+    public function testThatMethodInjectionCanOverrideContainerDependencies()
+    {
+        $foo = new Foo();
+        $bar = new Bar();
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('has')->willReturnMap([
+            [ParamsResolverInterface::class, false],
+            [Foo::class, true],
+            [Bar::class, true],
+        ]);
+        $container->method('get')->willReturnMap([
+            [Foo::class, $foo],
+            [Bar::class, $bar],
+        ]);
+
+        self::assertSame($foo, $container->get(Foo::class));
+        self::assertSame($bar, $container->get(Bar::class));
+
+        $requestBar = new Bar();
+
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getAttribute')->with(Bar::class)->willReturn($requestBar);
+        $request->method('getAttributes')->willReturn([
+            Bar::class => $requestBar,
+        ]);
+
+        self::assertSame($requestBar, $request->getAttribute(Bar::class));
+        self::assertEquals([Bar::class => $requestBar], $request->getAttributes());
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $handler = $factory($container, Handler::class);
+
+        self::assertInstanceOf(InvokableRequestHandler::class, $handler);
+        self::assertInstanceOf(Handler::class, $handler);
+
+        $handler->handle($request); // Triggers __invoke() via invokeHandler()
+
+        self::assertSame($container->get(Foo::class), $handler->getCurrentFoo());
+        self::assertNotSame($container->get(Bar::class), $handler->getCurrentBar());
+        self::assertSame($request->getAttribute(Bar::class), $handler->getCurrentBar());
+    }
 }
