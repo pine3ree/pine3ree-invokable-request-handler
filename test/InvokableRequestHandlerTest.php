@@ -21,6 +21,8 @@ use pine3ree\test\Http\Server\Asset\Bar;
 use pine3ree\test\Http\Server\Asset\Foo;
 use pine3ree\test\Http\Server\Asset\Handler;
 
+use function array_merge;
+
 class InvokableRequestHandlerTest extends TestCase
 {
     /**
@@ -33,8 +35,7 @@ class InvokableRequestHandlerTest extends TestCase
 
     public function testThatTheParamsResolverInstanceIsTheOneInjectedByFactory()
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->with(ParamsResolverInterface::class)->willReturn(false);
+        $container = $this->getContainerMock();
 
         $factory = new InvokableRequestHandlerFactory();
 
@@ -56,19 +57,12 @@ class InvokableRequestHandlerTest extends TestCase
         $foo = new Foo();
         $bar = new Bar();
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->willReturnMap([
-            [ParamsResolverInterface::class, false],
-            [Foo::class, true],
-            [Bar::class, true],
-        ]);
-        $container->method('get')->willReturnMap([
-            [Foo::class, $foo],
-            [Bar::class, $bar],
+        $container = $this->getContainerMock([
+            Foo::class => $foo,
+            Bar::class => $bar,
         ]);
 
-        $request = $this->createMock(ServerRequestInterface::class);
-        $request->method('getAttributes')->willReturn([]);
+        $request = $this->getServerRequestMock();
 
         $factory = new InvokableRequestHandlerFactory();
 
@@ -90,27 +84,19 @@ class InvokableRequestHandlerTest extends TestCase
         $foo = new Foo();
         $bar = new Bar();
 
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->willReturnMap([
-            [ParamsResolverInterface::class, false],
-            [Foo::class, true],
-            [Bar::class, true],
-        ]);
-        $container->method('get')->willReturnMap([
-            [Foo::class, $foo],
-            [Bar::class, $bar],
+        $container = $this->getContainerMock([
+            Foo::class => $foo,
+            Bar::class => $bar,
         ]);
 
         self::assertSame($foo, $container->get(Foo::class));
         self::assertSame($bar, $container->get(Bar::class));
 
-        $requestBar = new Bar();
+        $attributes = [
+            Bar::class => $requestBar = new Bar(),
+        ];
 
-        $request = $this->createMock(ServerRequestInterface::class);
-        $request->method('getAttribute')->with(Bar::class)->willReturn($requestBar);
-        $request->method('getAttributes')->willReturn([
-            Bar::class => $requestBar,
-        ]);
+        $request = $this->getServerRequestMock($attributes);
 
         self::assertSame($requestBar, $request->getAttribute(Bar::class));
         self::assertEquals([Bar::class => $requestBar], $request->getAttributes());
@@ -119,13 +105,81 @@ class InvokableRequestHandlerTest extends TestCase
 
         $handler = $factory($container, Handler::class);
 
-        self::assertInstanceOf(InvokableRequestHandler::class, $handler);
-        self::assertInstanceOf(Handler::class, $handler);
-
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
         self::assertSame($container->get(Foo::class), $handler->getCurrentFoo());
         self::assertNotSame($container->get(Bar::class), $handler->getCurrentBar());
         self::assertSame($request->getAttribute(Bar::class), $handler->getCurrentBar());
+    }
+
+    public function testThatRequestAttributesAreInjectedIfSameNameArgumentIsFound()
+    {
+        $container = $this->getContainerMock();
+
+        $attributes = [
+            'extra' => $extra_value = 42,
+        ];
+
+        $request = $this->getServerRequestMock($attributes);
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $handler = $factory($container, Handler::class);
+
+        $handler->handle($request); // Triggers __invoke() via invokeHandler()
+
+        self::assertSame($request->getAttribute('extra'), $handler->getCurrentExtra());
+    }
+
+    private function getContainerMock(array $getMap = [], ?array $hasMap = null): ContainerInterface
+    {
+        static $defaulHasMap = [
+            ParamsResolverInterface::class => false,
+            Foo::class => true,
+            Bar::class => true,
+            'extra' => true,
+        ];
+
+        $hasMap = $hasMap ? array_merge($defaulHasMap, $hasMap) : $defaulHasMap;
+        $hasReturnMap = [];
+        foreach ($hasMap as $name => $value) {
+            $hasReturnMap[] = [$name, $value];
+        }
+
+        $getReturnMap = [];
+        foreach ($getMap as $name => $value) {
+            $getReturnMap[] = [$name, $value];
+        }
+
+        $container = $this->createMock(ContainerInterface::class);
+
+        $container->method('has')->willReturnMap($hasReturnMap);
+
+        if (!empty($getReturnMap)) {
+            $container->method('get')->willReturnMap($getReturnMap);
+        }
+
+        return $container;
+    }
+    private function getServerRequestMock(array $attributes = []): ServerRequestInterface
+    {
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getAttributes')->willReturn($attributes);
+
+        if (empty($attributes)) {
+            $request->method('getAttribute')->willReturn(null);
+            return $request;
+        }
+
+        $returnMap = [];
+        foreach ($attributes as $name => $value) {
+            $returnMap[] = [$name, null, $value]; // NULL is the default value
+        }
+
+        echo json_encode($returnMap) . "\n";
+
+        $request->method('getAttribute')->willReturnMap($returnMap);
+
+        return $request;
     }
 }
