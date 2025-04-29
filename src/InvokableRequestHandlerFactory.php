@@ -8,17 +8,16 @@
 namespace pine3ree\Http\Server;
 
 use Psr\Container\ContainerInterface;
+use RuntimeException;
 use SplObjectStorage;
+use Throwable;
 use pine3ree\Container\ParamsResolver;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandler;
 
 /**
- * A generic factory for invokable-handlers which use method-injection for
- * dependencies using reflection
- *
- * The invokable-handler class constructor must only accept a single argument of
- * type ParamsResolverInterface
+ * A generic factory for invokable-handlers whose constructors only accepts a
+ * single argument of type ParamsResolverInterface
  */
 class InvokableRequestHandlerFactory
 {
@@ -43,6 +42,10 @@ class InvokableRequestHandlerFactory
             $cache->attach($container, $paramsResolver);
         }
 
-        return new $handlerFQCN($paramsResolver);
+        try {
+            return new $handlerFQCN($paramsResolver);
+        } catch (Throwable $ex) {
+            throw new RuntimeException($ex->getMessage());
+        }
     }
 }
