@@ -35,25 +35,6 @@ class InvokableRequestHandlerTest extends TestCase
         parent::setUp();
     }
 
-    public function testThatTheParamsResolverInstanceIsTheOneInjectedByFactory()
-    {
-        $container = $this->getContainerMock();
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, Handler::class);
-
-        $cacheProp = new ReflectionProperty($factory, 'cache');
-        $cacheProp->setAccessible(true);
-        $cache = $cacheProp->getValue($factory);
-
-        $paramsResolver = $cache->contains($container) ? $cache->offsetGet($container) : null;
-
-        self::assertInstanceOf(ParamsResolverInterface::class, $paramsResolver);
-        self::assertInstanceOf(Handler::class, $handler); /** @var Handler $handler */
-        self::assertSame($paramsResolver, $handler->getParamsResolver());
-    }
-
     public function testThatMethodInjectionWorksIfDependenciesAreFoundTheContainer()
     {
         $foo = new Foo('foo');

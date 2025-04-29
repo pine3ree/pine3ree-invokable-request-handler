@@ -32,8 +32,8 @@ class InvokableRequestHandlerFactoryTest extends TestCase
 
     public function testThatFactoryUsesParamsResolverInContainerIfFound()
     {
-        $container = $this->createMock(ContainerInterface::class);
         $paramsResolver = $this->createMock(ParamsResolverInterface::class);
+        $container = $this->getContainerMock($paramsResolver);
 
         $container->method('has')->with(ParamsResolverInterface::class)->willReturn(true);
         $container->method('get')->with(ParamsResolverInterface::class)->willReturn($paramsResolver);
@@ -65,8 +65,7 @@ class InvokableRequestHandlerFactoryTest extends TestCase
 
     public function testThatFactoryUsesCachedParamsResolverForSameContainer()
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->with(ParamsResolverInterface::class)->willReturn(false);
+        $container = $this->getContainerMock();
 
         $factory = new InvokableRequestHandlerFactory();
 
@@ -90,14 +89,42 @@ class InvokableRequestHandlerFactoryTest extends TestCase
         self::assertSame($paramsResolver1, $paramsResolver2);
     }
 
+    public function testThatTheParamsResolverInstanceIsTheOneInjectedByFactory()
+    {
+        $container = $this->getContainerMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $handler = $factory($container, Handler::class);
+
+        $cacheProp = new ReflectionProperty($factory, 'cache');
+        $cacheProp->setAccessible(true);
+        $cache = $cacheProp->getValue($factory);
+
+        $paramsResolver = $cache->contains($container) ? $cache->offsetGet($container) : null;
+
+        self::assertInstanceOf(ParamsResolverInterface::class, $paramsResolver);
+        self::assertInstanceOf(Handler::class, $handler); /** @var Handler $handler */
+        self::assertSame($paramsResolver, $handler->getParamsResolver());
+    }
+
     public function testThatHandlerClassesWithComplexConstructorsRaiseException()
     {
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('has')->with(ParamsResolverInterface::class)->willReturn(false);
+        $container = $this->getContainerMock();
 
         $factory = new InvokableRequestHandlerFactory();
 
         $this->expectException(RuntimeException::class);
         $complexHandler = $factory($container, ComplexHandler::class);
+    }
+
+    private function getContainerMock(?ParamsResolverInterface $paramsResolver = null): ContainerInterface
+    {
+        $container = $this->createMock(ContainerInterface::class);
+
+        $container->method('has')->with(ParamsResolverInterface::class)->willReturn(isset($paramsResolver));
+        $container->method('get')->with(ParamsResolverInterface::class)->willReturn($paramsResolver);
+
+        return $container;
     }
 }
