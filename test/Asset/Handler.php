@@ -34,7 +34,7 @@ class Handler extends InvokableRequestHandler implements RequestHandlerInterface
         $this->currentFoo = $foo;
         $this->currentBar = $bar;
 
-        return new HtmlResponse();
+        return new HtmlResponse('');
     }
 
     public function getParamsResolver(): ParamsResolverInterface

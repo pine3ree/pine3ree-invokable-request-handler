@@ -31,6 +31,6 @@ class ComplexHandler extends InvokableRequestHandler implements RequestHandlerIn
 
     public function __invoke(ServerRequestInterface $request): ResponseInterface
     {
-        return new HtmlResponse();
+        return new HtmlResponse('');
     }
 }
