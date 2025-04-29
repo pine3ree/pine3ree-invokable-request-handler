@@ -1,35 +1,59 @@
 <?php
 
 /**
- * @package     package
- * @subpackage  package-subpackage
+ * @package     pine3ree-invokable-request-handler
+ * @subpackage  pine3ree-invokable-request-handler-test
  * @author      pine3ree https://github.com/pine3ree
  */
 
 namespace pine3ree\test\Http\Server\Asset;
 
+use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use RuntimeException;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandler;
 
 /**
- * Class Handler
+ * Minimal Invokable Handler for unit tests
  */
 class Handler extends InvokableRequestHandler implements RequestHandlerInterface
 {
+    private ?ServerRequestInterface $currentRequest = null;
+    private ?Foo $currentFoo = null;
+    private ?Bar $currentBar = null;
+
     public function __invoke(
         ServerRequestInterface $request,
         Foo $foo,
         Bar $bar
     ): ResponseInterface {
-        // no op
+        // Set current values for testing
+        $this->currentRequest = $request;
+        $this->currentFoo = $foo;
+        $this->currentBar = $bar;
+
+        return new HtmlResponse();
     }
 
     public function getParamsResolver(): ParamsResolverInterface
     {
         return $this->paramsResolver;
+    }
+
+    public function getCurrentRequest(): ?ServerRequestInterface
+    {
+        return $this->currentRequest;
+    }
+
+    public function getCurrentFoo(): ?Foo
+    {
+        return $this->currentFoo;
+    }
+
+    public function getCurrentBar(): ?Bar
+    {
+        return $this->currentBar;
     }
 }
