@@ -48,7 +48,7 @@ class InvokableRequestHandlerFactoryTest extends TestCase
         self::assertSame($paramsResolver, $handler->getParamsResolver());
     }
 
-    public function testThatFactoryUsesCreatesNewParamsResolverIfNotFoundInContainer()
+    public function testThatFactoryCreatesNewParamsResolverIfNotFoundInContainer()
     {
         $container = $this->createMock(ContainerInterface::class);
         $container->method('has')->with(ParamsResolverInterface::class)->willReturn(false);
@@ -63,7 +63,7 @@ class InvokableRequestHandlerFactoryTest extends TestCase
         self::assertInstanceOf(ParamsResolver::class, $handler->getParamsResolver());
     }
 
-    public function testThatFactoryUsesCachesParamsResolverForSameContainer()
+    public function testThatFactoryUsesCachedParamsResolverForSameContainer()
     {
         $container = $this->createMock(ContainerInterface::class);
         $container->method('has')->with(ParamsResolverInterface::class)->willReturn(false);
