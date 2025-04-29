@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @package     pine3ree-abstract-factories
- * @subpackage  pine3ree-abstract-factories-test
+ * @package     pine3ree-invokable-request-handler
+ * @subpackage  pine3ree-invokable-request-handler-test
  * @author      pine3ree https://github.com/pine3ree
  */
 
