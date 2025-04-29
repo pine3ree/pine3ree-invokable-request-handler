@@ -8,7 +8,7 @@
 namespace pine3ree\Http\Server;
 
 use Psr\Http\Server\RequestHandlerInterface;
-use pine3ree\Container\ParamsResolver;
+use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandlerTrait;
 
 
@@ -29,9 +29,9 @@ abstract class InvokableRequestHandler implements RequestHandlerInterface
      * be sure to include the ParamsResolver dependency and an custom or more
      * approriate factory such as the eflection factory
      *
-     * @param ParamsResolver $paramsResolver
+     * @param ParamsResolverInterface $paramsResolver
      */
-    public function __construct(ParamsResolver $paramsResolver)
+    public function __construct(ParamsResolverInterface $paramsResolver)
     {
         $this->paramsResolver = $paramsResolver;
     }
