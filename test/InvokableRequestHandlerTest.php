@@ -50,13 +50,13 @@ class InvokableRequestHandlerTest extends TestCase
         $paramsResolver = $cache->contains($container) ? $cache->offsetGet($container) : null;
 
         self::assertInstanceOf(ParamsResolverInterface::class, $paramsResolver);
-        self::assertInstanceOf(Handler::class, $handler);
+        self::assertInstanceOf(Handler::class, $handler); /** @var Handler $handler */
         self::assertSame($paramsResolver, $handler->getParamsResolver());
     }
 
     public function testThatMethodInjectionWorksIfDependenciesAreFoundTheContainer()
     {
-        $foo = new Foo();
+        $foo = new Foo('foo');
         $bar = new Bar();
 
         $container = $this->getContainerMock([
@@ -83,7 +83,7 @@ class InvokableRequestHandlerTest extends TestCase
 
     public function testThatMethodInjectionCanOverrideContainerDependencies()
     {
-        $foo = new Foo();
+        $foo = new Foo('foo');
         $bar = new Bar();
 
         $container = $this->getContainerMock([
@@ -119,7 +119,7 @@ class InvokableRequestHandlerTest extends TestCase
         $container = $this->getContainerMock();
 
         $attributes = [
-            'extra' => $extra_value = 42,
+            'year' => 1492,
         ];
 
         $request = $this->getServerRequestMock($attributes);
@@ -130,7 +130,37 @@ class InvokableRequestHandlerTest extends TestCase
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
-        self::assertSame($request->getAttribute('extra'), $handler->getCurrentExtra());
+        self::assertSame($request->getAttribute('year'), $handler->getCurrentYear());
+    }
+
+    public function testThatDefaultArgumentValuesAreUsedIfNotInContainer()
+    {
+        $container = $this->getContainerMock(['year' => null]);
+
+        $request = $this->getServerRequestMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $handler = $factory($container, Handler::class);
+
+        $handler->handle($request); // Triggers __invoke() via invokeHandler()
+
+        self::assertSame(Handler::YEAR, $handler->getCurrentYear());
+    }
+
+    public function testThatContainerValuesAreUsedIfNotInRequestAttributes()
+    {
+        $container = $this->getContainerMock(['year' => 1492]);
+
+        $request = $this->getServerRequestMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $handler = $factory($container, Handler::class);
+
+        $handler->handle($request); // Triggers __invoke() via invokeHandler()
+
+        self::assertSame($container->get('year'), $handler->getCurrentYear());
     }
 
     public function testThatInvalidInvokeReturnValueRaisesException()
@@ -161,31 +191,50 @@ class InvokableRequestHandlerTest extends TestCase
         $handler->handle($request);
     }
 
-
-    private function getContainerMock(array $getMap = [], ?array $hasMap = null): ContainerInterface
+    public function testThatUnresolvableDependenciesRaiseException()
     {
-        static $defaulHasMap = [
-            ParamsResolverInterface::class => false,
-            Foo::class => true,
-            Bar::class => true,
-            'extra' => true,
+        $container = $this->getContainerMock([Foo::class => null]);
+
+        $request = $this->getServerRequestMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $handler = $factory($container, Handler::class);
+
+        $this->expectException(RuntimeException::class);
+        $handler->handle($request);
+    }
+
+    private function getContainerMock(?array $getMergeMap = null, ?array $hasMap = null): ContainerInterface
+    {
+        $containerKeys = [
+            ParamsResolverInterface::class,
+            Foo::class,
+            Bar::class,
+            'year',
         ];
 
-        $hasMap = $hasMap ? array_merge($defaulHasMap, $hasMap) : $defaulHasMap;
-        $hasReturnMap = [];
-        foreach ($hasMap as $name => $value) {
-            $hasReturnMap[] = [$name, $value];
-        }
+        $defaulGetMap = [
+            Foo::class => new Foo('foo'),
+        ];
 
+        $getMap = $getMergeMap ? array_merge($defaulGetMap, $getMergeMap) : $defaulGetMap;
         $getReturnMap = [];
         foreach ($getMap as $name => $value) {
             $getReturnMap[] = [$name, $value];
         }
 
+        $hasMap = [];
+        foreach ($containerKeys as $key) {
+            $hasMap[$key] = isset($getMap[$key]);
+        }
+        $hasReturnMap = [];
+        foreach ($hasMap as $name => $value) {
+            $hasReturnMap[] = [$name, $value];
+        }
+
         $container = $this->createMock(ContainerInterface::class);
-
         $container->method('has')->willReturnMap($hasReturnMap);
-
         if (!empty($getReturnMap)) {
             $container->method('get')->willReturnMap($getReturnMap);
         }
@@ -206,8 +255,6 @@ class InvokableRequestHandlerTest extends TestCase
         foreach ($attributes as $name => $value) {
             $returnMap[] = [$name, null, $value]; // NULL is the default value
         }
-
-        echo json_encode($returnMap) . "\n";
 
         $request->method('getAttribute')->willReturnMap($returnMap);
 

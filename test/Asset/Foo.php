@@ -13,4 +13,10 @@ namespace pine3ree\test\Http\Server\Asset;
  */
 class Foo
 {
+    private string $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
 }
