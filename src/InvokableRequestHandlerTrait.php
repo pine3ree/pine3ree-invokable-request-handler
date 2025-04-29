@@ -63,12 +63,12 @@ trait InvokableRequestHandlerTrait
                 ServerRequestInterface::class => $request, // Inject the request object
             ] + $request->getAttributes();
 
-            // Resolve the arguments for the __invoke() method
-            $args = $this->paramsResolver->resolve($this, $resolvedParams);
-
             try {
+                // Resolve the arguments for the __invoke() method
+                $args = $this->paramsResolver->resolve($this, $resolvedParams);
                 return empty($args) ? $this() : $this(...$args);
             } catch (Throwable $ex) {
+                var_dump($ex->getMessage());
                 throw new RuntimeException($ex->getMessage());
             }
         }
