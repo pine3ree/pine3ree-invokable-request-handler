@@ -15,6 +15,9 @@ use pine3ree\Container\ParamsResolver;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandler;
 
+use function class_exists;
+use function is_subclass_of;
+
 /**
  * A generic factory for invokable-handlers whose constructors only accepts a
  * single argument of type ParamsResolverInterface
@@ -29,6 +32,18 @@ class InvokableRequestHandlerFactory
 
     public function __invoke(ContainerInterface $container, string $handlerFQCN): InvokableRequestHandler
     {
+        if (!class_exists($handlerFQCN)) {
+            throw new RuntimeException(
+                "Unable to load the requested class {$handlerFQCN}"
+            );
+        }
+
+        if (!is_subclass_of($handlerFQCN, InvokableRequestHandler::class)) {
+            throw new RuntimeException(
+                "{$handlerFQCN} must be a subclass of " . InvokableRequestHandler::class
+            );
+        }
+
         $cache = $this->cache ?? $this->cache = new SplObjectStorage();
 
         /** @var SplObjectStorage<ContainerInterface, ParamsResolverInterface> $cache Previous line ensures this */
