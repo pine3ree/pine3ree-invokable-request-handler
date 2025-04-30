@@ -13,6 +13,7 @@ use Psr\Container\ContainerInterface;
 use ReflectionProperty;
 use RuntimeException;
 use SplObjectStorage;
+use stdClass;
 use pine3ree\Container\ParamsResolver;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandler;
@@ -28,6 +29,26 @@ class InvokableRequestHandlerFactoryTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+    }
+
+    public function testThatNonexistentHandlerClassesRaiseException()
+    {
+        $container = $this->getContainerMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $this->expectException(RuntimeException::class);
+        $factory($container, NonexistentHandler::class);
+    }
+
+    public function testThatInvalidHandlerClassesRaiseException()
+    {
+        $container = $this->getContainerMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $this->expectException(RuntimeException::class);
+        $factory($container, stdClass::class);
     }
 
     public function testThatFactoryUsesParamsResolverInContainerIfFound()
