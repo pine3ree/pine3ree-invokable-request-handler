@@ -21,13 +21,17 @@ use pine3ree\Http\Server\InvokableRequestHandler;
  */
 class InvokableRequestHandlerFactory
 {
+    /**
+     * Params resolvers cached by container
+     * @var SplObjectStorage<ContainerInterface, ParamsResolverInterface>|null
+     */
     private ?SplObjectStorage $cache = null;
 
     public function __invoke(ContainerInterface $container, string $handlerFQCN): InvokableRequestHandler
     {
         $cache = $this->cache ?? $this->cache = new SplObjectStorage();
 
-        /** @var SplObjectStorage $cache Previous line ensures this */
+        /** @var SplObjectStorage<ContainerInterface, ParamsResolverInterface> $cache Previous line ensures this */
         if ($cache->contains($container)) {
             $paramsResolver = $cache->offsetGet($container);
         } else {
