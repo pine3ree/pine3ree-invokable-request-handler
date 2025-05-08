@@ -6,11 +6,14 @@
  * @author      pine3ree https://github.com/pine3ree
  */
 
+declare(strict_types=1);
+
 namespace pine3ree\test\Http\Server;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionProperty;
 use RuntimeException;
@@ -46,10 +49,7 @@ class InvokableRequestHandlerTest extends TestCase
         ]);
 
         $request = $this->getServerRequestMock();
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, Handler::class);
+        $handler = $this->createHandler(Handler::class, $container);
 
         self::assertInstanceOf(InvokableRequestHandler::class, $handler);
         self::assertInstanceOf(Handler::class, $handler);
@@ -84,9 +84,7 @@ class InvokableRequestHandlerTest extends TestCase
         self::assertSame($requestBar, $request->getAttribute(Bar::class));
         self::assertEquals([Bar::class => $requestBar], $request->getAttributes());
 
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, Handler::class);
+        $handler = $this->createHandler(Handler::class, $container);
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
@@ -97,17 +95,12 @@ class InvokableRequestHandlerTest extends TestCase
 
     public function testThatRequestAttributesAreInjectedIfSameNameArgumentIsFound()
     {
-        $container = $this->getContainerMock();
-
         $attributes = [
             'year' => 1492,
         ];
 
         $request = $this->getServerRequestMock($attributes);
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, Handler::class);
+        $handler = $this->createHandler(Handler::class);
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
@@ -119,10 +112,7 @@ class InvokableRequestHandlerTest extends TestCase
         $container = $this->getContainerMock(['year' => null]);
 
         $request = $this->getServerRequestMock();
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, Handler::class);
+        $handler = $this->createHandler(Handler::class, $container);
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
@@ -134,10 +124,7 @@ class InvokableRequestHandlerTest extends TestCase
         $container = $this->getContainerMock(['year' => 1492]);
 
         $request = $this->getServerRequestMock();
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, Handler::class);
+        $handler = $this->createHandler(Handler::class, $container);
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
@@ -146,13 +133,8 @@ class InvokableRequestHandlerTest extends TestCase
 
     public function testThatInvalidInvokeReturnValueRaisesException()
     {
-        $container = $this->getContainerMock();
-
         $request = $this->getServerRequestMock();
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, InvalidHandler::class);
+        $handler = $this->createHandler(InvalidHandler::class);
 
         $this->expectException(RuntimeException::class);
         $handler->handle($request);
@@ -160,13 +142,8 @@ class InvokableRequestHandlerTest extends TestCase
 
     public function testThatMissingInvokeDefinitionRaisesException()
     {
-        $container = $this->getContainerMock();
-
         $request = $this->getServerRequestMock();
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, IncompleteHandler::class);
+        $handler = $this->createHandler(IncompleteHandler::class);
 
         $this->expectException(RuntimeException::class);
         $handler->handle($request);
@@ -177,13 +154,18 @@ class InvokableRequestHandlerTest extends TestCase
         $container = $this->getContainerMock([Foo::class => null]);
 
         $request = $this->getServerRequestMock();
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, Handler::class);
+        $handler = $this->createHandler(Handler::class, $container);
 
         $this->expectException(RuntimeException::class);
         $handler->handle($request);
+    }
+
+    private function createHandler(string $handlerClass, ?ContainerInterface $container = null): RequestHandlerInterface
+    {
+        $factory = new InvokableRequestHandlerFactory();
+        $container ??= $this->getContainerMock();
+
+        return $factory($container, $handlerClass);
     }
 
     private function getContainerMock(?array $getMergeMap = null, ?array $hasMap = null): ContainerInterface
@@ -222,6 +204,7 @@ class InvokableRequestHandlerTest extends TestCase
 
         return $container;
     }
+
     private function getServerRequestMock(array $attributes = []): ServerRequestInterface
     {
         $request = $this->createMock(ServerRequestInterface::class);
