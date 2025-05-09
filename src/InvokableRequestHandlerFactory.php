@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace pine3ree\Http\Server;
 
 use Psr\Container\ContainerInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
 use SplObjectStorage;
 use Throwable;
@@ -23,7 +24,6 @@ use function class_uses;
 use function in_array;
 use function is_bool;
 use function is_subclass_of;
-//use function sprintf;
 
 /**
  * A generic factory for invokable-handlers whose constructors only accepts a
@@ -38,7 +38,15 @@ class InvokableRequestHandlerFactory
      */
     private ?SplObjectStorage $cache = null;
 
-    public function __invoke(ContainerInterface $container, string $handlerFQCN, ?array $options = null): InvokableRequestHandler
+    /**
+     *
+     * @param ContainerInterface $container
+     * @param string $handlerFQCN The handler fully qualified class name
+     * @param array<string, mixed>|null $options
+     * @return InvokableRequestHandler|RequestHandlerInterface
+     * @throws RuntimeException
+     */
+    public function __invoke(ContainerInterface $container, string $handlerFQCN, ?array $options = null): RequestHandlerInterface
     {
         if (!class_exists($handlerFQCN)) {
             throw new RuntimeException(
@@ -46,14 +54,18 @@ class InvokableRequestHandlerFactory
             );
         }
 
+        $ifaceFQCN = RequestHandlerInterface::class;
         $baseFQCN  = InvokableRequestHandler::class;
         $traitFQCN = InvokableRequestHandlerTrait::class;
 
         if (!is_subclass_of($handlerFQCN, $baseFQCN)
-            && !in_array($traitFQCN, class_uses($handlerFQCN), true)
+            && !(is_subclass_of($handlerFQCN, $ifaceFQCN)
+                && in_array($traitFQCN, class_uses($handlerFQCN), true)
+            )
         ) {
             throw new RuntimeException(
-                "{$handlerFQCN} must be a subclass of `{$baseFQCN}` or use the trait `{$traitFQCN}`."
+                "{$handlerFQCN} must be either a subclass of `{$baseFQCN}` or"
+                . " implement `{$ifaceFQCN}` using the trait `{$traitFQCN}`."
             );
         }
 
@@ -80,7 +92,7 @@ class InvokableRequestHandlerFactory
 
         try {
             if (is_bool($typecastRequestAttributes)) {
-               return new $handlerFQCN($paramsResolver, $typecastRequestAttributes);
+                return new $handlerFQCN($paramsResolver, $typecastRequestAttributes);
             }
             return new $handlerFQCN($paramsResolver);
         } catch (Throwable $ex) {
