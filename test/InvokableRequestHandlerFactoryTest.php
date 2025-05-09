@@ -12,6 +12,7 @@ namespace pine3ree\test\Http\Server;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionProperty;
 use RuntimeException;
 use SplObjectStorage;
@@ -22,6 +23,9 @@ use pine3ree\Http\Server\InvokableRequestHandler;
 use pine3ree\Http\Server\InvokableRequestHandlerFactory;
 use pine3ree\test\Http\Server\Asset\Handler;
 use pine3ree\test\Http\Server\Asset\ComplexHandler;
+use pine3ree\test\Http\Server\Asset\NoTraitChildHandler;
+use pine3ree\test\Http\Server\Asset\NoTraitHandler;
+use pine3ree\test\Http\Server\Asset\TraitHandler;
 
 class InvokableRequestHandlerFactoryTest extends TestCase
 {
@@ -139,6 +143,37 @@ class InvokableRequestHandlerFactoryTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $complexHandler = $factory($container, ComplexHandler::class);
+    }
+
+    public function testThatHandlerClassesNotUsingInvokableTraitCannotBeCreateByProvidedFactory()
+    {
+        $container = $this->getContainerMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $this->expectException(RuntimeException::class);
+        $noTraitHandler = $factory($container, NoTraitHandler::class);
+    }
+
+    public function testThatHandlerClassesWithoutParentUsingInvokableTraitCannotBeCreateByProvidedFactory()
+    {
+        $container = $this->getContainerMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $this->expectException(RuntimeException::class);
+        $noTraitChildHandler = $factory($container, NoTraitChildHandler::class);
+    }
+
+    public function testThatHandlerClassesUsingInvokableTraitCanBeCreateByProvidedFactory()
+    {
+        $container = $this->getContainerMock();
+
+        $factory = new InvokableRequestHandlerFactory();
+
+        $traitHandler = $factory($container, TraitHandler::class); /** @var TraitHandler $traitHandler */
+        self::assertInstanceOf(TraitHandler::class, $traitHandler);
+        self::assertInstanceOf(RequestHandlerInterface::class, $traitHandler);
     }
 
     private function getContainerMock(?ParamsResolverInterface $paramsResolver = null): ContainerInterface

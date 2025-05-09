@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace pine3ree\test\Http\Server\Asset;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use pine3ree\Http\Server\InvokableRequestHandler;
 
