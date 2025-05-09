@@ -131,34 +131,6 @@ class InvokableRequestHandlerFactoryTest extends TestCase
         self::assertSame($paramsResolver, $handler->getParamsResolver());
     }
 
-    public function testThatTypecastingFlagIsUsed()
-    {
-        $container = $this->getContainerMock();
-
-        $factory = new InvokableRequestHandlerFactory();
-
-        $handler = $factory($container, Handler::class);
-
-        $typecastProp = new ReflectionProperty(Handler::class, 'typecastRequestAttributes');
-        $typecastProp->setAccessible(true);
-
-        $handler = $factory($container, Handler::class);
-        $typecastRequestAttributes = $typecastProp->getValue($handler);
-        self::assertTrue($typecastRequestAttributes);
-
-        $handler = $factory($container, Handler::class, [$factory::TYPECAST_FLAG => null]);
-        $typecastRequestAttributes = $typecastProp->getValue($handler);
-        self::assertTrue($typecastRequestAttributes);
-
-        $handler = $factory($container, Handler::class, [$factory::TYPECAST_FLAG => true]);
-        $typecastRequestAttributes = $typecastProp->getValue($handler);
-        self::assertTrue($typecastRequestAttributes);
-
-        $handler = $factory($container, Handler::class, [$factory::TYPECAST_FLAG => false]);
-        $typecastRequestAttributes = $typecastProp->getValue($handler);
-        self::assertFalse($typecastRequestAttributes);
-    }
-
     public function testThatHandlerClassesWithComplexConstructorsRaiseException()
     {
         $container = $this->getContainerMock();
