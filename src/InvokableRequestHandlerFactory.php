@@ -20,6 +20,7 @@ use pine3ree\Http\Server\InvokableRequestHandler;
 use pine3ree\Http\Server\InvokableRequestHandlerTrait;
 
 use function class_exists;
+use function class_parents;
 use function class_uses;
 use function in_array;
 use function is_subclass_of;
@@ -56,7 +57,7 @@ class InvokableRequestHandlerFactory
         $traitFQCN = InvokableRequestHandlerTrait::class;
 
         if (!is_subclass_of($handlerFQCN, $ifaceFQCN)
-            || !in_array($traitFQCN, class_uses($handlerFQCN), true)
+            || !$this->classUsesInvokableTrait($handlerFQCN)
         ) {
             throw new RuntimeException(
                 "{$handlerFQCN} must be either a subclass of `{$baseFQCN}` or"
@@ -82,8 +83,31 @@ class InvokableRequestHandlerFactory
 
         try {
             return new $handlerFQCN($paramsResolver);
-        } catch (Throwable $ex) { // @phpstan-ignore-line It is not considering other implementations
+        } catch (Throwable $ex) { // @phpstan-ignore-line
             throw new RuntimeException($ex->getMessage());
         }
+    }
+
+    private function classUsesInvokableTrait(string $handlerFQCN): bool
+    {
+        $traitFQCN = InvokableRequestHandlerTrait::class;
+
+        $class_traits = class_uses($handlerFQCN);
+        if (!empty($class_traits) && in_array($traitFQCN, $class_traits, true)) {
+            return true;
+        }
+
+        $class_parents = class_parents($handlerFQCN);
+        if (empty($class_parents)) {
+            return false;
+        }
+        foreach ($class_parents as $parentFQCN) {
+            $parent_traits = class_uses($parentFQCN);
+            if (!empty($parent_traits) && in_array($traitFQCN, $parent_traits, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
