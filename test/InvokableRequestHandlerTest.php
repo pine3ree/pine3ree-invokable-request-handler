@@ -56,10 +56,10 @@ class InvokableRequestHandlerTest extends TestCase
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
-        self::assertSame($foo, $handler->getCurrentFoo());
-        self::assertSame($bar, $handler->getCurrentBar());
-        self::assertSame($container->get(Foo::class), $handler->getCurrentFoo());
-        self::assertSame($container->get(Bar::class), $handler->getCurrentBar());
+        self::assertSame($foo, $handler->getFoo());
+        self::assertSame($bar, $handler->getBar());
+        self::assertSame($container->get(Foo::class), $handler->getFoo());
+        self::assertSame($container->get(Bar::class), $handler->getBar());
     }
 
     public function testThatMethodInjectionCanOverrideContainerDependencies()
@@ -88,9 +88,9 @@ class InvokableRequestHandlerTest extends TestCase
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
-        self::assertSame($container->get(Foo::class), $handler->getCurrentFoo());
-        self::assertNotSame($container->get(Bar::class), $handler->getCurrentBar());
-        self::assertSame($request->getAttribute(Bar::class), $handler->getCurrentBar());
+        self::assertSame($container->get(Foo::class), $handler->getFoo());
+        self::assertNotSame($container->get(Bar::class), $handler->getBar());
+        self::assertSame($request->getAttribute(Bar::class), $handler->getBar());
     }
 
     public function testThatRequestAttributesAreInjectedIfSameNameArgumentIsFound()
@@ -104,7 +104,7 @@ class InvokableRequestHandlerTest extends TestCase
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
-        self::assertSame($request->getAttribute('year'), $handler->getCurrentYear());
+        self::assertSame($request->getAttribute('year'), $handler->getYear());
     }
 
     public function testThatDefaultArgumentValuesAreUsedIfNotInContainer()
@@ -116,7 +116,7 @@ class InvokableRequestHandlerTest extends TestCase
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
-        self::assertSame(Handler::YEAR, $handler->getCurrentYear());
+        self::assertSame(Handler::YEAR, $handler->getYear());
     }
 
     public function testThatContainerValuesAreUsedIfNotInRequestAttributes()
@@ -128,7 +128,7 @@ class InvokableRequestHandlerTest extends TestCase
 
         $handler->handle($request); // Triggers __invoke() via invokeHandler()
 
-        self::assertSame($container->get('year'), $handler->getCurrentYear());
+        self::assertSame($container->get('year'), $handler->getYear());
     }
 
     public function testThatInvalidInvokeReturnValueRaisesException()

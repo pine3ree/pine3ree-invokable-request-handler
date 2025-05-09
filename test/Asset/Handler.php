@@ -22,10 +22,10 @@ use pine3ree\Http\Server\InvokableRequestHandler;
  */
 class Handler extends InvokableRequestHandler implements RequestHandlerInterface
 {
-    private ?ServerRequestInterface $currentRequest = null;
-    private ?Foo $currentFoo = null;
-    private ?Bar $currentBar = null;
-    private ?int $currentYear = null;
+    private ?ServerRequestInterface $Request = null;
+    private ?Foo $Foo = null;
+    private ?Bar $Bar = null;
+    private ?int $Year = null;
 
     public const YEAR = 1970;
 
@@ -35,11 +35,11 @@ class Handler extends InvokableRequestHandler implements RequestHandlerInterface
         Bar $bar = null,
         ?int $year = self::YEAR
     ): ResponseInterface {
-        // Set current values for testing
-        $this->currentRequest = $request;
-        $this->currentFoo = $foo;
-        $this->currentBar = $bar;
-        $this->currentYear = $year;
+        // Set  values for testing
+        $this->request = $request;
+        $this->foo = $foo;
+        $this->bar = $bar;
+        $this->year = $year;
 
         return new HtmlResponse('');
     }
@@ -49,23 +49,23 @@ class Handler extends InvokableRequestHandler implements RequestHandlerInterface
         return $this->paramsResolver;
     }
 
-    public function getCurrentRequest(): ?ServerRequestInterface
+    public function getRequest(): ?ServerRequestInterface
     {
-        return $this->currentRequest;
+        return $this->request;
     }
 
-    public function getCurrentFoo(): ?Foo
+    public function getFoo(): ?Foo
     {
-        return $this->currentFoo;
+        return $this->foo;
     }
 
-    public function getCurrentBar(): ?Bar
+    public function getBar(): ?Bar
     {
-        return $this->currentBar;
+        return $this->bar;
     }
 
-    public function getCurrentYear(): ?int
+    public function getYear(): ?int
     {
-        return $this->currentYear;
+        return $this->year;
     }
 }
