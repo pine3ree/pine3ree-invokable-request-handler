@@ -24,7 +24,7 @@ use function filter_var;
 use function sprintf;
 
 use const FILTER_NULL_ON_FAILURE;
-use const FILTER_VALIDATE_BOOL;
+use const FILTER_VALIDATE_BOOLEAN;
 use const FILTER_VALIDATE_FLOAT;
 use const FILTER_VALIDATE_INT;
 
@@ -155,7 +155,7 @@ trait InvokableRequestHandlerTrait
             return filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
         }
         if ('bool' === $php_type) {
-            return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
         }
 
         return $value;
