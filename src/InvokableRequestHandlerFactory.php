@@ -38,6 +38,8 @@ class InvokableRequestHandlerFactory
      */
     private ?SplObjectStorage $cache = null;
 
+    public const TYPECAST_FLAG = 'typecast_request_attributes';
+
     /**
      *
      * @param ContainerInterface $container
@@ -86,9 +88,7 @@ class InvokableRequestHandlerFactory
             $cache->attach($container, $paramsResolver);
         }
 
-        $typecastRequestAttributes = $options['typecastRequestAttributes']
-            ?? $options['typecast_request_attributes']
-            ?? null;
+        $typecastRequestAttributes = $options[self::TYPECAST_FLAG] ?? null;
 
         try {
             if (is_bool($typecastRequestAttributes)) {
