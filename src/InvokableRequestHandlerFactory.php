@@ -16,13 +16,19 @@ use Throwable;
 use pine3ree\Container\ParamsResolver;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandler;
+use pine3ree\Http\Server\InvokableRequestHandlerTrait;
 
 use function class_exists;
+use function class_uses;
+use function in_array;
+use function is_bool;
 use function is_subclass_of;
+//use function sprintf;
 
 /**
  * A generic factory for invokable-handlers whose constructors only accepts a
- * single argument of type ParamsResolverInterface
+ * single argument of type ParamsResolverInterface and optionally the request-attributes
+ * typecasting flag
  */
 class InvokableRequestHandlerFactory
 {
@@ -32,7 +38,7 @@ class InvokableRequestHandlerFactory
      */
     private ?SplObjectStorage $cache = null;
 
-    public function __invoke(ContainerInterface $container, string $handlerFQCN): InvokableRequestHandler
+    public function __invoke(ContainerInterface $container, string $handlerFQCN, ?array $options = null): InvokableRequestHandler
     {
         if (!class_exists($handlerFQCN)) {
             throw new RuntimeException(
@@ -40,9 +46,14 @@ class InvokableRequestHandlerFactory
             );
         }
 
-        if (!is_subclass_of($handlerFQCN, InvokableRequestHandler::class)) {
+        $baseFQCN  = InvokableRequestHandler::class;
+        $traitFQCN = InvokableRequestHandlerTrait::class;
+
+        if (!is_subclass_of($handlerFQCN, $baseFQCN)
+            && !in_array($traitFQCN, class_uses($handlerFQCN), true)
+        ) {
             throw new RuntimeException(
-                "{$handlerFQCN} must be a subclass of " . InvokableRequestHandler::class
+                "{$handlerFQCN} must be a subclass of `{$baseFQCN}` or use the trait `{$traitFQCN}`."
             );
         }
 
@@ -63,7 +74,14 @@ class InvokableRequestHandlerFactory
             $cache->attach($container, $paramsResolver);
         }
 
+        $typecastRequestAttributes = $options['typecastRequestAttributes']
+            ?? $options['typecast_request_attributes']
+            ?? null;
+
         try {
+            if (is_bool($typecastRequestAttributes)) {
+               return new $handlerFQCN($paramsResolver, $typecastRequestAttributes);
+            }
             return new $handlerFQCN($paramsResolver);
         } catch (Throwable $ex) {
             throw new RuntimeException($ex->getMessage());
