@@ -15,8 +15,8 @@
 .phpunit.result.cache
 .phpunit.cache
 
-
 .php_cs.cache
+.php-cs.cache
 .phpcs.cache
 
 .php-cs-fixer.cache
