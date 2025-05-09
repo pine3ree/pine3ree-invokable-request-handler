@@ -40,14 +40,14 @@ class InvokableRequestHandlerFactory
      *
      * @param ContainerInterface $container
      * @param string $handlerFQCN The handler fully qualified class name
-     * @return InvokableRequestHandler|RequestHandlerInterface
+     * @return RequestHandlerInterface
      * @throws RuntimeException
      */
     public function __invoke(ContainerInterface $container, string $handlerFQCN): RequestHandlerInterface
     {
         if (!class_exists($handlerFQCN)) {
             throw new RuntimeException(
-                "Unable to load the requested class {$handlerFQCN}"
+                "Unable to load the requested class `{$handlerFQCN}`"
             );
         }
 
@@ -66,7 +66,6 @@ class InvokableRequestHandlerFactory
 
         $cache = $this->cache ?? $this->cache = new SplObjectStorage();
 
-        /** @var SplObjectStorage<ContainerInterface, ParamsResolverInterface> $cache Previous line ensures this */
         if ($cache->contains($container)) {
             $paramsResolver = $cache->offsetGet($container);
         } else {
@@ -83,7 +82,7 @@ class InvokableRequestHandlerFactory
 
         try {
             return new $handlerFQCN($paramsResolver);
-        } catch (Throwable $ex) {
+        } catch (Throwable $ex) { // @phpstan-ignore-line It is not considering other implementations
             throw new RuntimeException($ex->getMessage());
         }
     }

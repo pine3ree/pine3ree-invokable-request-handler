@@ -78,13 +78,9 @@ trait InvokableRequestHandlerTrait
     {
         if (is_callable($this)) {
             // Build params to be injected as resolved arguments
-            $attributes = $request->getAttributes();
-            if ($this->typecastRequestAttributes) {
-                $attributes = $this->typecastScalarValues($attributes);
-            }
             $resolvedParams = [
                 ServerRequestInterface::class => $request, // Inject the request object
-            ] + $attributes;
+            ] + $this->typecastScalarAttributes($request->getAttributes());
 
             try {
                 // Resolve the arguments for the __invoke() method
@@ -102,12 +98,15 @@ trait InvokableRequestHandlerTrait
     }
 
     /**
-     * @param array<string, mixed> $values
+     * Perform type-casting of scalar request-attributes based on type-hinting
+     * of corresponding parameters of the `__invoke` method
+     *
+     * @param array<string, mixed> $attributes
      * @return array<string, mixed>
      */
-    protected function typecastScalarValues(array $values): array
+    protected function typecastScalarAttributes(array $attributes): array
     {
-        if (empty($values)) {
+        if (empty($attributes)) {
             return [];
         }
 
@@ -121,7 +120,7 @@ trait InvokableRequestHandlerTrait
 
             $name = $rp->getName();
             // NULL values are discarded
-            $value = $values[$name] ?? null;
+            $value = $attributes[$name] ?? null;
             if (!isset($value)) {
                 continue;
             }
@@ -129,11 +128,11 @@ trait InvokableRequestHandlerTrait
             $type = $rp->getType();
             // Only perform typecasting for parameters with single optionally nullable type-hint
             if ($type instanceof ReflectionNamedType && $type->isBuiltin()) {
-                $values[$name] = $this->typecastValue($type->getName(), $value);
+                $attributes[$name] = $this->typecastValue($type->getName(), $value);
             }
         }
 
-        return $values;
+        return $attributes;
     }
 
     /**

@@ -31,14 +31,9 @@ abstract class InvokableRequestHandler implements RequestHandlerInterface
      * approriate factory such as the eflection factory
      *
      * @param ParamsResolverInterface $paramsResolver
-     * @param bool $typecastRequestAttributes Flag to enable/disable type-casting
-     *      on scalar request attributes
      */
-    public function __construct(
-        ParamsResolverInterface $paramsResolver,
-        bool $typecastRequestAttributes = true
-    ) {
+    public function __construct(ParamsResolverInterface $paramsResolver)
+    {
         $this->paramsResolver = $paramsResolver;
-        $this->typecastRequestAttributes = $typecastRequestAttributes;
     }
 }
