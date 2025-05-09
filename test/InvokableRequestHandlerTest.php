@@ -20,6 +20,7 @@ use RuntimeException;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Http\Server\InvokableRequestHandler;
 use pine3ree\Http\Server\InvokableRequestHandlerFactory;
+use pine3ree\test\Http\Server\Asset\AttributesHandler;
 use pine3ree\test\Http\Server\Asset\Bar;
 use pine3ree\test\Http\Server\Asset\Foo;
 use pine3ree\test\Http\Server\Asset\Handler;
@@ -159,6 +160,105 @@ class InvokableRequestHandlerTest extends TestCase
         $this->expectException(RuntimeException::class);
         $handler->handle($request);
     }
+
+    /**
+     * @dataProvider provideTypeCastingTestingValues
+     */
+    public function testTypeCasting(string $attributeName, $requestValue, $expectedValue)
+    {
+        $container = $this->createMock(ContainerInterface::class);
+        $container->method('has')->willReturn(false);
+
+        $request = $this->getServerRequestMock([
+            $attributeName => $requestValue,
+        ]);
+
+        /** @var AttributesHandler $handler */
+        $handler = $this->createHandler(AttributesHandler::class, $container);
+        $handler->handle($request);
+
+        self::assertEquals($expectedValue, $handler->getArg($attributeName));
+    }
+
+    public function provideTypeCastingTestingValues(): array
+    {
+        return [
+            // ?int $customer_id = null
+            ['customer_id', null, null],
+            ['customer_id', 42, 42],
+            ['customer_id', '42', 42],
+            ['customer_id', 42.0, 42],
+            ['customer_id', true, 1],
+            ['customer_id', false, 0],
+            ['customer_id', '', 0],
+            // int $product_id = 0
+            ['product_id', null, 0],
+            // ?string $title = null
+            ['title', null, null],
+            ['title', '', ''],
+            ['title', 'abc','abc'],
+            ['title', 123, '123'],
+            ['title', 12.0, '12'],
+            ['title', 12.3, '12.3'],
+            ['title', true, '1'],
+            ['title', false, ''],
+            // string $slug = ''
+            ['slug', null, ''],
+            // ?float $price = null
+            ['price', null, null],
+            ['price', 0, 0.0],
+            ['price', 123, 123.0],
+            ['price', '123', 123],
+            ['price', '12.3', 12.3],
+            ['price', true, 1.0],
+            ['price', false, 0.0],
+            ['price', '', 0.0],
+            // bool $flag = null
+            ['vat', null, 0.0],
+            // bool $flag = null
+            ['flag', null, null],
+            ['flag', true, true],
+            ['flag', false, false],
+            ['flag', 1, true],
+            ['flag', 0, false],
+            ['flag', '1', true],
+            ['flag', '0', false],
+            ['flag', 'true', true],
+            ['flag', 'false', false],
+            ['flag', 'yes', true],
+            ['flag', 'no', false],
+            ['flag', '', false],
+            ['flag', 'a', null], // NULL on failure
+            ['flag', 123, null], // NULL on failure
+            ['flag', -123, null], // NULL on failure
+            // bool $truth = true
+            ['truth', null, true],
+            ['truth', 123, true], // NULL on failure => use default TRUE
+            ['truth', -123, true], // NULL on failure => use default TRUE
+            // bool $lie = false
+            ['lie', null, false],
+            ['lie', 123, false], // NULL on failure => use default FALSE
+            ['lie', -123, false], // NULL on failure => use default FALSE
+            // ?array $array1 = null,
+            ['array1', null, null],
+            ['array1', [], []],
+            ['array1', [1, 2, 3], [1, 2, 3]],
+            // array $array2 = [,
+            ['array2', null, []],
+            // $uanswer = 42
+            ['uanswer', null, 42],
+            ['uanswer', '', ''],
+            ['uanswer', 'abc', 'abc'],
+            ['uanswer', [42], [42]],
+            ['uanswer', 42.0, 42.0],
+            ['uanswer', false,false],
+            ['uanswer', null, 42],
+            // $unullable = null
+            ['unullable', null, null],
+            ['unullable', 'abc', 'abc'],
+        ];
+    }
+
 
     private function createHandler(string $handlerClass, ?ContainerInterface $container = null): RequestHandlerInterface
     {
