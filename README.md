@@ -23,6 +23,34 @@ arguments.
 
 ## Examples
 
+### Signature example:
+
+```php
+<?php
+
+namespace App\Controller\Shop\Product;
+
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use pine3ree\Http\Server\InvokableRequestHandler;
+// ...more use(s)
+
+/**
+ * An invokable controller for route '/shop/product/{id}'
+ */
+class MyRequestHandler extends InvokableRequestHandler // implements RequestHandlerInterface
+{
+    public function __invoke(
+        // ServerRequestInterface $request, // this is optional...but at the end... it is a request-handler
+        // type-hinted dependencies and optional named parameters matching request attributes names
+    ): ResponseInterface {
+        // do something with dependency and request and return a psr-response
+    }
+}
+
+```
+
 ### Basic example:
 
 ```php
@@ -45,7 +73,7 @@ use pine3ree\Http\Server\InvokableRequestHandler;
 /**
  * An invokable controller for route '/shop/product/{id}'
  */
-class Read extends InvokableRequestHandler implements RequestHandlerInterface;
+class Read extends InvokableRequestHandler implements RequestHandlerInterface
 {
     public function __invoke(
         ServerRequestInterface $request,
@@ -96,7 +124,7 @@ use Psr\Http\Message\ServerRequestInterface;
 //..
 use pine3ree\Http\Server\InvokableRequestHandlerTrait;
 
-class Read implements RequestHandlerInterface;
+class Read implements RequestHandlerInterface
 {
     use InvokableRequestHandlerTrait;
 
@@ -149,7 +177,7 @@ use pine3ree\Http\Server\InvokableRequestHandler;
  * html-responses
  */
 
-abstract class TemplateInvokableRequestHandler extends InvokableRequestHandler implements RequestHandlerInterface;
+abstract class TemplateInvokableRequestHandler extends InvokableRequestHandler implements RequestHandlerInterface
 {
     // Override the default trait implementation using the protected method `invokeHandler`
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -176,7 +204,7 @@ abstract class TemplateInvokableRequestHandler extends InvokableRequestHandler i
  * Example of base invokable handler that returns arrays for json-repsonses
  */
 
-abstract class JsonInvokableRequestHandler extends InvokableRequestHandler implements RequestHandlerInterface;
+abstract class JsonInvokableRequestHandler extends InvokableRequestHandler implements RequestHandlerInterface
 {
     // Override the default trait implementation using the protected method `invokeHandler`
     public function handle(ServerRequestInterface $request): ResponseInterface
