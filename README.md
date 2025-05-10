@@ -36,7 +36,7 @@ class Read extends InvokableRequestHandler implements RequestHandlerInterface;
         ServerRequestInterface $request,
         ORMInterface $orm,
         TemplateRendererInterface $view,
-        SessionInterface $session, // stored as request attribute under the SessionInterface:class key
+        SessionInterface $session, // stored as request attribute with the SessionInterface:class key
         ?int $id = null // Route-match parameter stored as request attribute with the 'id' key
     ): ResponseInterface {
 
