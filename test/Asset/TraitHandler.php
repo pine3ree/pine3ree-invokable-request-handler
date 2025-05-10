@@ -27,9 +27,4 @@ class TraitHandler implements RequestHandlerInterface
     {
         return new HtmlResponse('');
     }
-
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        return $this($request);
-    }
 }
