@@ -18,6 +18,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use ReflectionProperty;
 use RuntimeException;
 use pine3ree\Container\ParamsResolverInterface;
+use pine3ree\Http\Server\Exception\UnexpectedValueException;
 use pine3ree\Http\Server\InvokableRequestHandler;
 use pine3ree\Http\Server\InvokableRequestHandlerFactory;
 use pine3ree\test\Http\Server\Asset\AttributesHandler;
@@ -137,7 +138,7 @@ class InvokableRequestHandlerTest extends TestCase
         $request = $this->getServerRequestMock();
         $handler = $this->createHandler(InvalidHandler::class);
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(UnexpectedValueException::class);
         $handler->handle($request);
     }
 

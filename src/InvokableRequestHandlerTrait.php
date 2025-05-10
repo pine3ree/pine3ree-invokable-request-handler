@@ -13,8 +13,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionNamedType;
 use ReflectionParameter;
-use RuntimeException;
 use Throwable;
+use pine3ree\Http\Server\Exception\UnexpectedValueException;
+use pine3ree\Http\Server\Exception\RuntimeException;
 use pine3ree\Container\ParamsResolverInterface;
 use pine3ree\Helper\Reflection;
 
@@ -47,7 +48,7 @@ trait InvokableRequestHandlerTrait
      * as the response body or an array return value to build and return a json
      * response or to automatically render a template into a response body
      *
-     * @throws RuntimeException
+     * @throws UnexpectedValueException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -57,7 +58,7 @@ trait InvokableRequestHandlerTrait
             return $result;
         }
 
-        throw new RuntimeException(sprintf(
+        throw new UnexpectedValueException(sprintf(
             'The `%s::__invoke(...)` method did not return a `%s` instance',
             static::class,
             ResponseInterface::class

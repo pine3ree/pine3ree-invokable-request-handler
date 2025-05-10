@@ -11,11 +11,11 @@ namespace pine3ree\Http\Server;
 
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use RuntimeException;
 use SplObjectStorage;
 use Throwable;
 use pine3ree\Container\ParamsResolver;
 use pine3ree\Container\ParamsResolverInterface;
+use pine3ree\Http\Server\Exception\RuntimeException;
 use pine3ree\Http\Server\InvokableRequestHandler;
 use pine3ree\Http\Server\InvokableRequestHandlerTrait;
 
