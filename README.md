@@ -113,3 +113,74 @@ class Read implements RequestHandlerInterface;
 
 ```
 
+Examples of `__invoke()` not returning a response object:
+
+```php
+<?php
+
+namespace App\Http\Server;
+
+// ...
+use App\Http\Message\Response\HtmlResponse;
+use App\Http\Message\Response\JsonResponse;
+use App\View\TemplateRendererInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use pine3ree\Http\Server\InvokableRequestHandler;
+
+/**
+ * Example of base invokable handler that returns rendered-templates strings for
+ * html-responses
+ */
+
+abstract class TemplateInvokableRequestHandler extends InvokableRequestHandler implements RequestHandlerInterface;
+{
+    // Override the default trait implementation using the protected method `invokeHandler`
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        return new HtmlResponse(
+            $this->invokeHandler($request);
+        );
+    }
+
+    /**
+     * In this example the implementation must return strings
+     *
+     * public function __invoke(
+     *     TemplateRendererInterface $view,
+     *     // Other dependencies and/or route params here
+     * ): string {
+     *     // build the template $vars map here
+     *     return $view->render('shop/product/read.html.php', $vars);
+     * }
+     */
+}
+
+/**
+ * Example of base invokable handler that returns arrays for json-repsonses
+ */
+
+abstract class JsonInvokableRequestHandler extends InvokableRequestHandler implements RequestHandlerInterface;
+{
+    // Override the default trait implementation using the protected method `invokeHandler`
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        return new JsonResponse(
+            $this->invokeHandler($request);
+        );
+    }
+
+    /**
+     * In this example the implementation must return arrays
+     *
+     * public function __invoke(
+     *     // Dependencies and/or route params here
+     * ): array {
+     *     // build the json-content $vars map here
+     *     return $vars;
+     * }
+     */
+}
+
+```
