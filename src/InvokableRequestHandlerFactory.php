@@ -38,6 +38,19 @@ class InvokableRequestHandlerFactory
     private ?SplObjectStorage $cache = null;
 
     /**
+     * Creates an invokable-request-handler instance injected with a params-resolver
+     * either from the container or a newly create instance.
+     *
+     * The provided handler class MUST implement a simple constructor accepting
+     * the params-resolver as the only argument, otherwise a custom (or an autowiring)
+     * factory is required.
+     *
+     * The provided handler class is validated to use the invokable-request-handler-trait.
+     *
+     * The handler instance is injected with a params-resolver either from the container
+     * or a newly create instance.
+     * 
+     * Params resolvers are cached per-container.
      *
      * @param ContainerInterface $container
      * @param string $handlerFQCN The handler fully qualified class name
