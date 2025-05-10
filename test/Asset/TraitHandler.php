@@ -13,7 +13,6 @@ namespace pine3ree\test\Http\Server\Asset;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use pine3ree\Http\Server\InvokableRequestHandlerTrait;
 
 /**
