@@ -187,7 +187,7 @@ abstract class TemplateInvokableRequestHandler extends InvokableRequestHandler i
      *     // Other dependencies and/or route params here
      * ): string {
      *     // build the template $vars map here
-     *     return $view->render('shop/product/read.html.php', $vars);
+     *     return $view->render('some/template/file.html.php', $vars);
      * }
      */
 }
