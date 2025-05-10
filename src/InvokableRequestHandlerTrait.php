@@ -40,13 +40,6 @@ trait InvokableRequestHandlerTrait
     protected ParamsResolverInterface $paramsResolver;
 
     /**
-     * @var bool $typecastRequestAttributes Flag to enable/disable type-casting
-     *      on scalar request attributes. Should be enabled if strict_types are
-     *      used as route parameters are usually resolved as string|null
-     */
-    protected bool $typecastRequestAttributes = true;
-
-    /**
      * {@inheritDoc}
      *
      * Override this method if your `__invoke()` implementation does not return
