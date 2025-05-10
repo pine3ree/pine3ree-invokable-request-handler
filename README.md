@@ -37,10 +37,10 @@ class Read extends InvokableRequestHandler implements RequestHandlerInterface;
         ORMInterface $orm,
         TemplateRendererInterface $view,
         SessionInterface $session, // stored as request attribute under the SessionInterface:class key
-        ?int $id = null // Route-match parameter stored as request attribute under the 'id' key
+        ?int $id = null // Route-match parameter stored as request attribute with the 'id' key
     ): ResponseInterface {
 
-        $id = (int)$id;
+        $id = $id ?? 0;
         if (id < 1) {
             return new NotFoundResponse();
         }
@@ -62,3 +62,54 @@ class Read extends InvokableRequestHandler implements RequestHandlerInterface;
 }
 
 ```
+
+Same example using the provided trait when a custom constructor is needed:
+
+```php
+<?php
+
+namespace App\Controller\Shop\Product;
+
+use App\Model\Entity\Product;
+use App\Model\ORMInterface;
+use App\Session\SessionInterface;
+use App\Http\Message\Response\HtmlResponse;
+//..
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+//..
+use pine3ree\Http\Server\InvokableRequestHandlerTrait;
+
+class Read implements RequestHandlerInterface;
+{
+    use InvokableRequestHandlerTrait;
+
+    private array $options;
+
+    public function __construct(
+        ParamsResolverInterface $paramsResolver,
+        array $options
+    ) {
+        $this->paramsResolver = $paramsResolver;
+        $this->options = $options;
+    }
+
+    public function __invoke(
+        ServerRequestInterface $request,
+        ORMInterface $orm,
+        TemplateRendererInterface $view,
+        SessionInterface $session, // stored as request attribute under the SessionInterface:class key
+        ?int $id = null // Route-match parameter stored as request attribute with the 'id' key
+    ): ResponseInterface {
+
+        // Do something with $id
+
+        // Do something using $this->options
+
+        // Return a response
+    }
+}
+
+```
+
