@@ -46,6 +46,16 @@ trait InvokableRequestHandlerTrait
      */
     protected bool $typecastRequestAttributes = true;
 
+    /**
+     * {@inheritDoc}
+     *
+     * Override this method if your `__invoke()` implementation does not return
+     * a Response. You may for instance accept a string return value and use it
+     * as the response body or an array return value to build and return a json
+     * response or to automatically render a template into a response body
+     *
+     * @throws RuntimeException
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $result = $this->invokeHandler($request);
@@ -64,11 +74,6 @@ trait InvokableRequestHandlerTrait
     /**
      * Make sure that the `__invoke()` is implemented, and then call it injecting
      * its dependencies fetched from the request attributes and/or from the container
-     *
-     * Override this method if your `__invoke()` implementation does not return
-     * a Response. You may for instance accept a string return value and use it
-     * as the response body or an array return value to build and return a json
-     * response or to automatically render a template into a response body
      *
      * @param ServerRequestInterface $request
      * @return mixed
