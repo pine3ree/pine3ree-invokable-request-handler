@@ -8,7 +8,20 @@ the `__invoke` method, whose dependencies are resolved either using the request
 attributes or by the container, via the composed params-resolver. A type-hinted
 `ServerRequestInterface` dependency is resolved to the current request.
 
-Example:
+The default implementation requires the return type to be a psr-response object.
+
+In scenarios where you might need to return other types, you will also need to
+override the default psr `handle` method and build a response object using the
+return value of the protected method `invokeHandler(ServerRequestInterface)`
+which is responsible for executing the handler itself after resolving its
+arguments.
+
+## How it works
+
+`$handler->handle($request)` calls protected method `$this->invokeHandler($request)`
+`$this->invokeHandler($request)` resolve `__invoke` `$args` and calls `$this(...$args)`
+
+## Example:
 
 ```php
 <?php
@@ -63,7 +76,7 @@ class Read extends InvokableRequestHandler implements RequestHandlerInterface;
 
 ```
 
-Same example using the provided trait when a custom constructor is needed:
+### Same example using the provided trait when a custom constructor is needed:
 
 ```php
 <?php
@@ -113,7 +126,7 @@ class Read implements RequestHandlerInterface;
 
 ```
 
-Examples of `__invoke()` not returning a response object:
+## Examples of `__invoke()` not returning a response object:
 
 ```php
 <?php
