@@ -26,8 +26,6 @@ arguments.
 ### Signature example:
 
 ```php
-<?php
-
 namespace App\Handler;
 
 use Psr\Http\Server\RequestHandlerInterface;
@@ -54,8 +52,6 @@ class MyRequestHandler extends InvokableRequestHandler // implements RequestHand
 ### Basic example:
 
 ```php
-<?php
-
 namespace App\Controller\Shop\Product;
 
 use App\Model\Entity\Product;
@@ -109,8 +105,6 @@ class Read extends InvokableRequestHandler implements RequestHandlerInterface
 ### Same example using the provided trait when a custom constructor is needed:
 
 ```php
-<?php
-
 namespace App\Controller\Shop\Product;
 
 use App\Model\Entity\Product;
@@ -159,8 +153,6 @@ class Read implements RequestHandlerInterface
 ### Examples of `__invoke()` not returning a response object:
 
 ```php
-<?php
-
 namespace App\Http\Server;
 
 // ...
