@@ -49,7 +49,7 @@ class InvokableRequestHandlerFactory
      *
      * The handler instance is injected with a params-resolver either from the container
      * or a newly create instance.
-     * 
+     *
      * Params resolvers are cached per-container.
      *
      * @param ContainerInterface $container
