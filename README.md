@@ -21,7 +21,9 @@ arguments.
 `$handler->handle($request)` calls protected method `$this->invokeHandler($request)`
 `$this->invokeHandler($request)` resolve `__invoke` `$args` and calls `$this(...$args)`
 
-## Example:
+## Examples
+
+### Basic example:
 
 ```php
 <?php
@@ -126,7 +128,7 @@ class Read implements RequestHandlerInterface;
 
 ```
 
-## Examples of `__invoke()` not returning a response object:
+### Examples of `__invoke()` not returning a response object:
 
 ```php
 <?php
