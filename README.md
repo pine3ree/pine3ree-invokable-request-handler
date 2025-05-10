@@ -28,7 +28,7 @@ arguments.
 ```php
 <?php
 
-namespace App\Controller\Shop\Product;
+namespace App\Handler;
 
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
