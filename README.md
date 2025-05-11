@@ -19,6 +19,7 @@ arguments.
 ## How it works
 
 `$handler->handle($request)` calls protected method `$this->invokeHandler($request)`
+
 `$this->invokeHandler($request)` resolve `__invoke` `$args` and calls `$this(...$args)`
 
 ## Examples
