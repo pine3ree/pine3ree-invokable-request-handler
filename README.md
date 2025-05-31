@@ -194,7 +194,7 @@ abstract class TemplateInvokableRequestHandler extends InvokableRequestHandler i
 }
 
 /**
- * Example of base invokable handler that returns arrays for json-repsonses
+ * Example of base invokable handler that returns arrays for json-responses
  */
 
 abstract class JsonInvokableRequestHandler extends InvokableRequestHandler implements RequestHandlerInterface
