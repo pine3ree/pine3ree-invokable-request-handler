@@ -43,7 +43,7 @@ class InvokableRequestHandlerFactory
      * either from the container or a newly create instance.
      *
      * The provided handler class MUST implement a simple constructor accepting
-     * the params-resolver as the only argument, otherwise a custom (or an autowiring)
+     * the params-resolver as the only argument, otherwise a custom or an autowiring
      * factory is required.
      *
      * The provided handler class is validated to use the invokable-request-handler-trait.
