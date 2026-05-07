@@ -4,7 +4,7 @@ name: "Continuous Integration"
 on: [push, pull_request]
 
 env:
-  COMPOSER_ARGS: '--no-interaction --no-progress --prefer-dist --optimize-autoloader'
+  COMPOSER_ARGS: '--no-interaction --no-progress --no-security-blocking --prefer-dist --optimize-autoloader'
 
 jobs:
 
