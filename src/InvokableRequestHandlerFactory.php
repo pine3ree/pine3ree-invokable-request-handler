@@ -24,6 +24,7 @@ use function class_parents;
 use function class_uses;
 use function in_array;
 use function is_subclass_of;
+use function sprintf;
 
 /**
  * A generic factory for invokable-handlers whose constructors only accepts a
@@ -65,17 +66,16 @@ class InvokableRequestHandlerFactory
             );
         }
 
-        $ifaceFQCN = RequestHandlerInterface::class;
-        $baseFQCN  = InvokableRequestHandler::class;
-        $traitFQCN = InvokableRequestHandlerTrait::class;
-
-        if (!is_subclass_of($handlerFQCN, $ifaceFQCN)
+        if (!is_subclass_of($handlerFQCN, RequestHandlerInterface::class)
             || !$this->classUsesInvokableTrait($handlerFQCN)
         ) {
-            throw new RuntimeException(
-                "{$handlerFQCN} must be either a subclass of `{$baseFQCN}` or"
-                . " implement `{$ifaceFQCN}` using the trait `{$traitFQCN}`."
-            );
+            throw new RuntimeException(sprintf(
+                "`%s` must either be a subclass of `%s` or implement `%s` using the trait `%s`.",
+                $handlerFQCN,
+                InvokableRequestHandler::class,
+                RequestHandlerInterface::class,
+                InvokableRequestHandlerTrait::class
+            ));
         }
 
         $cache = $this->cache ?? $this->cache = new SplObjectStorage();
