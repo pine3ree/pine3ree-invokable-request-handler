@@ -36,13 +36,13 @@ use pine3ree\Http\Server\InvokableRequestHandler;
 // ...more use(s)
 
 /**
- * An invokable controller for route '/shop/product/{id}'
+ * Signature example for a generic invokable request-handler
  */
 class MyRequestHandler extends InvokableRequestHandler // implements RequestHandlerInterface
 {
     public function __invoke(
-        // ServerRequestInterface $request, // this is optional...but at the end... it is a request-handler
-        // type-hinted dependencies and optional named parameters matching request attributes names
+        // ServerRequestInterface $request, // this is optional...but at the end... it is a request-handler.
+        // Type-hinted dependencies and optional named parameters matching request attributes names.
     ): ResponseInterface {
         // do something with dependency and request and return a psr-response
     }
